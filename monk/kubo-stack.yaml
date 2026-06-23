@@ -1,0 +1,79 @@
+namespace: kubo
+
+stack:
+  defines: runnable
+  inherits: kubo/base
+  metadata:
+    name: Kubo IPFS Production Stack
+    description: |
+      Production-oriented standalone Kubo node with persistent repository
+      storage, published non-default libp2p peer ports, private RPC API, and a
+      gateway service intended for Monk ingress on real deployment targets.
+      The gateway exposes read-only IPFS content retrieval; the administrative
+      RPC API is not exposed.
+    tags: ipfs, kubo, standalone, production, p2p
+    website: https://ipfs.tech/
+    source: https://github.com/ipfs/kubo
+    publisher: ipfs
+  variables:
+    repo-volume-name:
+      type: string
+      value: kubo-stack-repo
+      description: Monk volume subdirectory used for durable IPFS repository data in the production stack.
+    fuse-ipfs-volume-name:
+      type: string
+      value: kubo-stack-ipfs-fuse
+      description: Monk volume subdirectory mounted at /ipfs in the production stack.
+    fuse-ipns-volume-name:
+      type: string
+      value: kubo-stack-ipns-fuse
+      description: Monk volume subdirectory mounted at /ipns in the production stack.
+    swarm-tcp-host-port:
+      type: int
+      value: 4101
+      description: Non-default host TCP port published for Kubo libp2p peer traffic.
+    swarm-udp-host-port:
+      type: int
+      value: 4101
+      description: Non-default host UDP port published for Kubo libp2p QUIC peer traffic.
+    swarm-websocket-host-port:
+      type: int
+      value: 4102
+      description: Non-default host TCP port published for Kubo libp2p WebSocket peer traffic.
+  services:
+    api:
+      description: Private Kubo RPC API; intentionally not published and not routed through ingress.
+      container: ipfs
+      port: <- $api-port
+      protocol: tcp
+      publish: false
+    gateway:
+      description: Kubo HTTP gateway routed through production ingress for read-only IPFS content retrieval.
+      container: ipfs
+      port: <- $gateway-port
+      protocol: tcp
+      publish: false
+      ingress-routes:
+        gateway:
+          path-prefix: /
+    swarm-tcp:
+      description: Public Kubo libp2p swarm TCP endpoint for peer networking.
+      container: ipfs
+      port: <- $swarm-port
+      protocol: tcp
+      host-port: <- $swarm-tcp-host-port
+      publish: true
+    swarm-udp:
+      description: Public Kubo libp2p swarm UDP endpoint for QUIC peer networking.
+      container: ipfs
+      port: <- $swarm-port
+      protocol: udp
+      host-port: <- $swarm-udp-host-port
+      publish: true
+    swarm-websocket:
+      description: Public Kubo libp2p WebSocket endpoint for browser-capable peers.
+      container: ipfs
+      port: <- $swarm-websocket-port
+      protocol: tcp
+      host-port: <- $swarm-websocket-host-port
+      publish: true

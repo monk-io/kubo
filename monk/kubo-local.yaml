@@ -1,0 +1,85 @@
+namespace: kubo
+
+stack-local:
+  defines: runnable
+  inherits: kubo/base
+  metadata:
+    name: Kubo IPFS Local Verification Stack
+    description: |
+      Local standalone Kubo flavor for template verification. It uses separate
+      persistent storage and non-default published host ports for the gateway,
+      RPC API, and libp2p peer services. The RPC API exposure is for local
+      verification only and should not be used as the production stack.
+    tags: ipfs, kubo, standalone, local, verification
+    website: https://ipfs.tech/
+    source: https://github.com/ipfs/kubo
+    publisher: ipfs
+  variables:
+    repo-volume-name:
+      type: string
+      value: kubo-local-repo
+      description: Monk volume subdirectory used for durable IPFS repository data in the local flavor.
+    fuse-ipfs-volume-name:
+      type: string
+      value: kubo-local-ipfs-fuse
+      description: Monk volume subdirectory mounted at /ipfs in the local flavor.
+    fuse-ipns-volume-name:
+      type: string
+      value: kubo-local-ipns-fuse
+      description: Monk volume subdirectory mounted at /ipns in the local flavor.
+    api-host-port:
+      type: int
+      value: 15001
+      description: Non-default local host port published for the Kubo RPC API verification endpoint.
+    gateway-host-port:
+      type: int
+      value: 18080
+      description: Non-default local host port published for the Kubo HTTP gateway.
+    swarm-tcp-host-port:
+      type: int
+      value: 14101
+      description: Non-default local host TCP port published for Kubo libp2p peer traffic.
+    swarm-udp-host-port:
+      type: int
+      value: 14101
+      description: Non-default local host UDP port published for Kubo libp2p QUIC peer traffic.
+    swarm-websocket-host-port:
+      type: int
+      value: 14102
+      description: Non-default local host TCP port published for Kubo libp2p WebSocket peer traffic.
+  services:
+    api:
+      description: Local-only Kubo RPC API endpoint used for external verification with HTTP POST /api/v0/version.
+      container: ipfs
+      port: <- $api-port
+      protocol: tcp
+      host-port: <- $api-host-port
+      publish: true
+    gateway:
+      description: Local Kubo HTTP gateway endpoint for manual content retrieval checks.
+      container: ipfs
+      port: <- $gateway-port
+      protocol: tcp
+      host-port: <- $gateway-host-port
+      publish: true
+    swarm-tcp:
+      description: Local Kubo libp2p swarm TCP endpoint for peer networking.
+      container: ipfs
+      port: <- $swarm-port
+      protocol: tcp
+      host-port: <- $swarm-tcp-host-port
+      publish: true
+    swarm-udp:
+      description: Local Kubo libp2p swarm UDP endpoint for QUIC peer networking.
+      container: ipfs
+      port: <- $swarm-port
+      protocol: udp
+      host-port: <- $swarm-udp-host-port
+      publish: true
+    swarm-websocket:
+      description: Local Kubo libp2p WebSocket endpoint for browser-capable peers.
+      container: ipfs
+      port: <- $swarm-websocket-port
+      protocol: tcp
+      host-port: <- $swarm-websocket-host-port
+      publish: true

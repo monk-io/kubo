@@ -1,0 +1,5 @@
+LOAD monk/kubo.yaml
+LOAD monk/kubo-stack.yaml
+LOAD monk/kubo-local.yaml
+
+ENTRY kubo/stack-local
