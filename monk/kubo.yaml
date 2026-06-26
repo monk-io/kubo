@@ -1,0 +1,107 @@
+namespace: kubo
+
+base:
+  defines: runnable
+  metadata:
+    name: Kubo IPFS Node
+    description: |
+      Base single-node Kubo runnable using the public Docker Hub ipfs/kubo
+      image, persistent IPFS repository storage, and private service exposure
+      by default. Inherit this template for standalone stacks or for
+      application stacks that need a self-hosted IPFS node.
+    tags: ipfs, kubo, p2p, storage
+    website: https://ipfs.tech/
+    source: https://github.com/ipfs/kubo
+    publisher: ipfs
+  variables:
+    kubo-image-tag:
+      type: string
+      value: latest
+      description: Public Docker Hub tag for the ipfs/kubo image.
+    ipfs-path:
+      type: string
+      env: IPFS_PATH
+      value: /data/ipfs
+      description: Filesystem path inside the container where the IPFS repository is stored.
+    repo-volume-name:
+      type: string
+      value: kubo-repo
+      description: Monk volume subdirectory used for durable IPFS repository data.
+    fuse-ipfs-volume-name:
+      type: string
+      value: kubo-ipfs-fuse
+      description: Monk volume subdirectory mounted at /ipfs for optional FUSE paths.
+    fuse-ipns-volume-name:
+      type: string
+      value: kubo-ipns-fuse
+      description: Monk volume subdirectory mounted at /ipns for optional FUSE paths.
+    log-level:
+      type: string
+      env: GOLOG_LOG_LEVEL
+      value: ""
+      description: Optional Kubo GOLOG_LOG_LEVEL value for targeted daemon logging.
+    api-port:
+      type: int
+      value: 5001
+      description: Kubo RPC API port inside the container; keep this private except local verification.
+    gateway-port:
+      type: int
+      value: 8080
+      description: Kubo HTTP gateway port inside the container.
+    swarm-port:
+      type: int
+      value: 4001
+      description: Kubo libp2p swarm TCP and UDP port inside the container.
+    swarm-websocket-port:
+      type: int
+      value: 8081
+      description: Kubo libp2p WebSocket swarm port inside the container.
+  containers:
+    ipfs:
+      image: ipfs/kubo
+      image-tag: <- $kubo-image-tag
+      restart: unless-stopped
+      paths:
+        - <- `${volume-path}/${repo-volume-name}:${ipfs-path}`
+        - <- `${volume-path}/${fuse-ipfs-volume-name}:/ipfs`
+        - <- `${volume-path}/${fuse-ipns-volume-name}:/ipns`
+      logs:
+        quota: 100M
+        count: 5
+  services:
+    api:
+      description: Private Kubo RPC API for trusted Monk-connected workloads.
+      container: ipfs
+      port: <- $api-port
+      protocol: tcp
+      publish: false
+    gateway:
+      description: Private Kubo HTTP gateway for content retrieval by connected workloads.
+      container: ipfs
+      port: <- $gateway-port
+      protocol: tcp
+      publish: false
+    swarm-tcp:
+      description: Private Kubo libp2p swarm TCP endpoint; inheriting stacks may publish it for peer networking.
+      container: ipfs
+      port: <- $swarm-port
+      protocol: tcp
+      publish: false
+    swarm-udp:
+      description: Private Kubo libp2p swarm UDP endpoint for QUIC; inheriting stacks may publish it for peer networking.
+      container: ipfs
+      port: <- $swarm-port
+      protocol: udp
+      publish: false
+    swarm-websocket:
+      description: Private Kubo libp2p WebSocket endpoint; inheriting stacks may publish it for browser-capable peers.
+      container: ipfs
+      port: <- $swarm-websocket-port
+      protocol: tcp
+      publish: false
+  checks:
+    readiness:
+      code: exec("ipfs", "ipfs", "--api=/ip4/127.0.0.1/tcp/5001", "id") contains?("ID")
+      period: 10
+      initialDelay: 20
+      attempts: 30
