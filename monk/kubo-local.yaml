@@ -15,18 +15,6 @@ stack-local:
     source: https://github.com/ipfs/kubo
     publisher: ipfs
   variables:
-    repo-volume-name:
-      type: string
-      value: kubo-local-repo
-      description: Monk volume subdirectory used for durable IPFS repository data in the local flavor.
-    fuse-ipfs-volume-name:
-      type: string
-      value: kubo-local-ipfs-fuse
-      description: Monk volume subdirectory mounted at /ipfs in the local flavor.
-    fuse-ipns-volume-name:
-      type: string
-      value: kubo-local-ipns-fuse
-      description: Monk volume subdirectory mounted at /ipns in the local flavor.
     api-host-port:
       type: int
       value: 15001

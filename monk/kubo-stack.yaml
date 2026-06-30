@@ -16,18 +16,6 @@ stack:
     source: https://github.com/ipfs/kubo
     publisher: ipfs
   variables:
-    repo-volume-name:
-      type: string
-      value: kubo-stack-repo
-      description: Monk volume subdirectory used for durable IPFS repository data in the production stack.
-    fuse-ipfs-volume-name:
-      type: string
-      value: kubo-stack-ipfs-fuse
-      description: Monk volume subdirectory mounted at /ipfs in the production stack.
-    fuse-ipns-volume-name:
-      type: string
-      value: kubo-stack-ipns-fuse
-      description: Monk volume subdirectory mounted at /ipns in the production stack.
     swarm-tcp-host-port:
       type: int
       value: 4101
