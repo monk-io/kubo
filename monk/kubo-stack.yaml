@@ -50,18 +50,15 @@ stack:
       port: <- $swarm-port
       protocol: tcp
       host-port: <- $swarm-tcp-host-port
-      publish: true
     swarm-udp:
       description: Public Kubo libp2p swarm UDP endpoint for QUIC peer networking.
       container: ipfs
       port: <- $swarm-port
       protocol: udp
       host-port: <- $swarm-udp-host-port
-      publish: true
     swarm-websocket:
       description: Public Kubo libp2p WebSocket endpoint for browser-capable peers.
       container: ipfs
       port: <- $swarm-websocket-port
       protocol: tcp
       host-port: <- $swarm-websocket-host-port
-      publish: true
