@@ -48,6 +48,7 @@ stack-local:
       port: <- $gateway-port
       protocol: tcp
       host-port: <- $gateway-host-port
+      publish: true
     swarm-tcp:
       description: Local Kubo libp2p swarm TCP endpoint for peer networking.
       container: ipfs
