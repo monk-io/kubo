@@ -15,18 +15,6 @@ stack-local:
     source: https://github.com/ipfs/kubo
     publisher: ipfs
   variables:
-    repo-volume-name:
-      type: string
-      value: kubo-local-repo
-      description: Monk volume subdirectory used for durable IPFS repository data in the local flavor.
-    fuse-ipfs-volume-name:
-      type: string
-      value: kubo-local-ipfs-fuse
-      description: Monk volume subdirectory mounted at /ipfs in the local flavor.
-    fuse-ipns-volume-name:
-      type: string
-      value: kubo-local-ipns-fuse
-      description: Monk volume subdirectory mounted at /ipns in the local flavor.
     api-host-port:
       type: int
       value: 15001
@@ -54,7 +42,6 @@ stack-local:
       port: <- $api-port
       protocol: tcp
       host-port: <- $api-host-port
-      publish: true
     gateway:
       description: Local Kubo HTTP gateway endpoint for manual content retrieval checks.
       container: ipfs
@@ -68,18 +55,15 @@ stack-local:
       port: <- $swarm-port
       protocol: tcp
       host-port: <- $swarm-tcp-host-port
-      publish: true
     swarm-udp:
       description: Local Kubo libp2p swarm UDP endpoint for QUIC peer networking.
       container: ipfs
       port: <- $swarm-port
       protocol: udp
       host-port: <- $swarm-udp-host-port
-      publish: true
     swarm-websocket:
       description: Local Kubo libp2p WebSocket endpoint for browser-capable peers.
       container: ipfs
       port: <- $swarm-websocket-port
       protocol: tcp
       host-port: <- $swarm-websocket-host-port
-      publish: true

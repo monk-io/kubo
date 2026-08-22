@@ -16,18 +16,6 @@ stack:
     source: https://github.com/ipfs/kubo
     publisher: ipfs
   variables:
-    repo-volume-name:
-      type: string
-      value: kubo-stack-repo
-      description: Monk volume subdirectory used for durable IPFS repository data in the production stack.
-    fuse-ipfs-volume-name:
-      type: string
-      value: kubo-stack-ipfs-fuse
-      description: Monk volume subdirectory mounted at /ipfs in the production stack.
-    fuse-ipns-volume-name:
-      type: string
-      value: kubo-stack-ipns-fuse
-      description: Monk volume subdirectory mounted at /ipns in the production stack.
     swarm-tcp-host-port:
       type: int
       value: 4101
@@ -62,18 +50,15 @@ stack:
       port: <- $swarm-port
       protocol: tcp
       host-port: <- $swarm-tcp-host-port
-      publish: true
     swarm-udp:
       description: Public Kubo libp2p swarm UDP endpoint for QUIC peer networking.
       container: ipfs
       port: <- $swarm-port
       protocol: udp
       host-port: <- $swarm-udp-host-port
-      publish: true
     swarm-websocket:
       description: Public Kubo libp2p WebSocket endpoint for browser-capable peers.
       container: ipfs
       port: <- $swarm-websocket-port
       protocol: tcp
       host-port: <- $swarm-websocket-host-port
-      publish: true

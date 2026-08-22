@@ -23,18 +23,6 @@ base:
       env: IPFS_PATH
       value: /data/ipfs
       description: Filesystem path inside the container where the IPFS repository is stored.
-    repo-volume-name:
-      type: string
-      value: kubo-repo
-      description: Monk volume subdirectory used for durable IPFS repository data.
-    fuse-ipfs-volume-name:
-      type: string
-      value: kubo-ipfs-fuse
-      description: Monk volume subdirectory mounted at /ipfs for optional FUSE paths.
-    fuse-ipns-volume-name:
-      type: string
-      value: kubo-ipns-fuse
-      description: Monk volume subdirectory mounted at /ipns for optional FUSE paths.
     log-level:
       type: string
       env: GOLOG_LOG_LEVEL
@@ -61,13 +49,23 @@ base:
       image: ipfs/kubo
       image-tag: <- $kubo-image-tag
       restart: unless-stopped
-      paths:
-        - <- `${volume-path}/${repo-volume-name}:${ipfs-path}`
-        - <- `${volume-path}/${fuse-ipfs-volume-name}:/ipfs`
-        - <- `${volume-path}/${fuse-ipns-volume-name}:/ipns`
+      mounted-volumes:
+        repo:
+          path: <- `${ipfs-path}`
+        ipfs:
+          path: /ipfs
+        ipns:
+          path: /ipns
       logs:
         quota: 100M
         count: 5
+  volumes:
+    repo:
+      kind: local
+    ipfs:
+      kind: local
+    ipns:
+      kind: local
   services:
     api:
       description: Private Kubo RPC API for trusted Monk-connected workloads.
